@@ -5,4 +5,3 @@ def read_file():
     return df_source
 
 df=read_file()
-print(df.head(4))
