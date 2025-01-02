@@ -10,4 +10,5 @@ def check_duplicate():
 
 def check_emptyfile():
     target_df = pd.read_csv("NewEarthData.csv",sep=",")
-    assert not target_df.empty, "Target File is Empty- Please check the File"
+    assert not target_df.empty, ("Target File is Empty- Please check the File")
+
