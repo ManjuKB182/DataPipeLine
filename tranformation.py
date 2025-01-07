@@ -7,7 +7,7 @@ spark = SparkSession.builder \
 
 #print("Spark session created successfully!")
 
-file_path="/Users/manjukb/Desktop/ETL_DataBase/File01.csv"
+file_path="/Users/manjukb/Desktop/Work_Related/ETL_python_Automation/DataPipeLine/NewEarthData.csv"
 
 df = spark.read.csv(file_path, header=True, inferSchema=True)
 df.show(4)
@@ -19,7 +19,7 @@ True_value_table = spark.sql('''
                              From BaseTable
                              Where Cryosleep = "true"   
                                 ''')
-file_Out_path = "/Users/manjukb/Desktop/ETL_DataBase/truevalues.csv"
+file_Out_path = "/Users/manjukb/Desktop/Work_Related/ETL_python_Automation/DataPipeLine/truevalues.csv"
 True_value_table.coalesce(2).write.csv(file_Out_path, header= True, mode= "overwrite")
 
 spark.stop()
