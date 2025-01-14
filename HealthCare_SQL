@@ -1,0 +1,21 @@
+
+
+With New_Table As 
+(
+Select User, Count(*) As Count_2 
+FROM
+    (
+    SELECT USER, claim_id ,Start_dt,End_Date, lag(Start_dt)over(Partition By User Order By Start_dt ) As Prev_Date,
+    Case when lag(Start_dt)over(Partition By User Order By Start_dt ) Is NULL Then Start_dt Else lag(Start_dt)over(Partition By User Order By Start_dt ) End As New_Col
+    FROM `sharp-gecko-416405.new_dataset.hclaim` 
+    )
+Where  New_Col = Start_dt
+Group By User
+Having Count(*) > 1
+)
+Select N.User 
+From New_Table N
+INNER JOIN 
+    (SELECT A.USER, count(*) As Count_1
+    FROM `sharp-gecko-416405.new_dataset.hclaim` A Group By 1 ) M 
+ON N.User = M.User AND N.Count_2 = M.Count_1 ;
