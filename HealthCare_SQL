@@ -19,3 +19,26 @@ INNER JOIN
     (SELECT A.USER, count(*) As Count_1
     FROM `sharp-gecko-416405.new_dataset.hclaim` A Group By 1 ) M 
 ON N.User = M.User AND N.Count_2 = M.Count_1 ;
+
+
+GCP
+Select Start_dt, Format_date('%d',Start_dt) As Day,
+       Format_date('%Y',Start_dt) As Year,
+       Format_date('%B',Start_dt) As Month, 
+       Format_date('%b',Start_dt) As Month_Short , 
+       extract(Month From Start_dt) As Month_No
+From  `sharp-gecko-416405.new_dataset.hclaim`
+
+
+AWS
+SELECT 
+    Start_dt, 
+    TO_CHAR(Start_dt, 'DD') AS Day,                -- Day of the month
+    TO_CHAR(Start_dt, 'YYYY') AS Year,            -- Year
+    TO_CHAR(Start_dt, 'Month') AS Month,          -- Full month name
+    TO_CHAR(Start_dt, 'Mon') AS Month_Short,      -- Abbreviated month name
+    DATE_PART('month', Start_dt) AS Month_No      -- Numeric month
+FROM 
+    hclaim;
+    
+
