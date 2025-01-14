@@ -23,9 +23,6 @@ plt.xlabel('Groups')
 plt.ylabel('Counts')
 plt.show()
 
-#print('\nSPRINT EVENT REGISTRATION\n\n',New_df)
-
-#New addition
-
+print('\nSPRINT EVENT REGISTRATION\n\n',New_df)
 
 
