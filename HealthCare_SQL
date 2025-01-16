@@ -21,7 +21,8 @@ INNER JOIN
 ON N.User = M.User AND N.Count_2 = M.Count_1 ;
 
 
-GCP
+# Date functions in  - GCP
+
 Select Start_dt, Format_date('%d',Start_dt) As Day,
        Format_date('%Y',Start_dt) As Year,
        Format_date('%B',Start_dt) As Month, 
@@ -30,7 +31,7 @@ Select Start_dt, Format_date('%d',Start_dt) As Day,
 From  `sharp-gecko-416405.new_dataset.hclaim`
 
 
-AWS
+# Date functions in  - AWS
 SELECT 
     Start_dt, 
     TO_CHAR(Start_dt, 'DD') AS Day,                -- Day of the month
@@ -41,4 +42,92 @@ SELECT
 FROM 
     hclaim;
     
+
+# List All the Users and find Total Claim with Average_Claim above 400
+
+Select User,Format_date('%B',Start_dt) As Month, Sum(Claim_Amt) As Sum_Claim---, AVG(Claim_Amt) As Avg_Claim
+From  `sharp-gecko-416405.new_dataset.hclaim`
+Group By 1,2
+Having AVG(Claim_Amt) >= 400
+
+
+#A patient should not have overlapping insurance coverage periods. Identify patients who have overlapping coverage periods.
+With Claim_prd AS 
+(
+Select *,lead(Start_dt) Over ( Partition By User Order By User,Start_dt desc ) As next_claim_strt_dt
+From  `sharp-gecko-416405.new_dataset.hclaim`
+)
+
+select A.User, A.Claim_id, A.Start_dt, A.end_date
+From Claim_prd A
+Where A.next_claim_strt_dt Between A.Start_dt and A.end_date
+ORDER BY 1
+
+Select DISTINCT A.USER,A.claim_id,A.Start_dt,A.End_Date
+From  `sharp-gecko-416405.new_dataset.hclaim` A
+      INNER JOIN `sharp-gecko-416405.new_dataset.hclaim` B
+      ON A.USER = B.USER AND A.claim_id != B.claim_id AND A.Start_dt <= B.Start_dt AND A.End_Date >= B.End_Date
+
+
+
+
+CREATE TABLE `sharp-gecko-416405.new_dataset.t_cust`
+(
+  CustId INT64,
+  Name STRING,
+  Plan_Name STRING,
+  Plan_start DATE,
+  Plan_end DATE
+);
+
+INSERT INTO `sharp-gecko-416405.new_dataset.t_cust`
+(
+  CustId, Name, Plan_Name,Plan_start, Plan_end)
+VALUES 
+  (101, 'Madhu','P1','2021-01-01', '2021-06-30'),
+  (101, 'Madhu','P2','2021-07-01', '2021-12-22'),
+  (103, 'Ashwin','P1','2021-08-01', '2021-11-20'),
+  (103, 'Ashwin','P2','2021-12-15', '2022-11-30'),
+  (104, 'Mona','P2','2021-02-01', '2021-12-31'),
+  (104, 'Mona','P1','2022-03-01', '2022-10-31');
+
+
+Select CustId, Plan_Name, Plan_start, Plan_end From (
+Select *,lead(Plan_start) Over (Partition By CustId Order By Plan_start ) as Next_Plan_Date, 
+date_diff( lead(Plan_start) Over (Partition By CustId Order By Plan_start ),Plan_end, Day ) As Exp_Diff
+From `sharp-gecko-416405.new_dataset.t_cust`
+Order by CustId, Plan_start
+)
+Where Exp_Diff = 1 ;--> 30;
+
+
+With Start_Date As 
+(
+Select * From 
+(
+Select *,
+      Rank() Over (Partition By CustId Order By Plan_start ) AS RANK_Start
+      --Rank() Over (Partition By CustId Order By Plan_end DESC ) AS RANK_Start
+From `sharp-gecko-416405.new_dataset.t_cust`
+)
+Where Rank_Start = 1
+),
+End_Date As 
+(
+Select * From 
+(
+Select *,
+      --Rank() Over (Partition By CustId Order By Plan_start ) AS RANK_Start
+      Rank() Over (Partition By CustId Order By Plan_end DESC ) AS RANK_Start
+From `sharp-gecko-416405.new_dataset.t_cust`
+)
+Where Rank_Start = 1
+)
+
+Select S.CustId,S.Plan_start As Start_date, E.Plan_end As End_Date
+From Start_Date S 
+      Left Join End_date E On S.CustID = E.CustId
+Order By S.CustId
+
+
 
