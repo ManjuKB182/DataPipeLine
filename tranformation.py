@@ -29,8 +29,8 @@ spark.stop()
 
 
 
-spark = SparkSession.builder.appName('S3')/
-        .config('spark.hadoop.fs.aws.secrete.key:', 'org.apache.hadoop:hadoop-aws:2.7.4')/
+spark = SparkSession.builder.appName('S3') \
+        .config('spark.hadoop.fs.aws.secrete.key:', 'org.apache.hadoop:hadoop-aws:2.7.4') \
         .getOrCreate()
 
 
@@ -43,8 +43,8 @@ s3_df.createOrReplaceTempView('s3_table')
 RS_jdbc_url = "jdbc:sqlserver://<server>:<port>;databaseName=<database>"
 RS_table = "dbo.table_name"
 RS_properties = {
-    "user": "<username
-    "password": "<password>"
+    "user": "<username",
+    "password": "<password>",
     "driver": "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 }
 
