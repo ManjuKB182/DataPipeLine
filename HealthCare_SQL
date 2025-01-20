@@ -51,7 +51,8 @@ Group By 1,2
 Having AVG(Claim_Amt) >= 400
 
 
-#A patient should not have overlapping insurance coverage periods. Identify patients who have overlapping coverage periods.
+# A patient should not have overlapping insurance coverage periods. Identify patients who have overlapping coverage periods.
+
 With Claim_prd AS 
 (
 Select *,lead(Start_dt) Over ( Partition By User Order By User,Start_dt desc ) As next_claim_strt_dt
@@ -63,14 +64,14 @@ From Claim_prd A
 Where A.next_claim_strt_dt Between A.Start_dt and A.end_date
 ORDER BY 1
 
+
 Select DISTINCT A.USER,A.claim_id,A.Start_dt,A.End_Date
 From  `sharp-gecko-416405.new_dataset.hclaim` A
       INNER JOIN `sharp-gecko-416405.new_dataset.hclaim` B
       ON A.USER = B.USER AND A.claim_id != B.claim_id AND A.Start_dt <= B.Start_dt AND A.End_Date >= B.End_Date
 
 
-
-
+# Find the number of days between the first and last claim for each user.
 CREATE TABLE `sharp-gecko-416405.new_dataset.t_cust`
 (
   CustId INT64,
@@ -101,6 +102,7 @@ Order by CustId, Plan_start
 Where Exp_Diff = 1 ;--> 30;
 
 
+# Find the number of days between the first and last claim for each user.
 With Start_Date As 
 (
 Select * From 

@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession # type: ignore
 
 # Create a Spark session
 spark = SparkSession.builder \
@@ -27,9 +27,10 @@ spark.stop()
 
 
 
+from pyspark.sql import SparkSession
 
-
-spark = SparkSession.builder.appName('S3') \
+spark = SparkSession.builder \
+        .appName('S3') \
         .config('spark.hadoop.fs.aws.secrete.key:', 'org.apache.hadoop:hadoop-aws:2.7.4') \
         .getOrCreate()
 
