@@ -25,6 +25,43 @@ True_value_table.coalesce(2).write.csv(file_Out_path, header= True, mode= "overw
 
 spark.stop()
 
+# Json File  handling
+from pyspark.sql import SparkSession  # type: ignore
+
+# Create a Spark session
+spark = SparkSession.builder \
+    .appName("Test Spark Installation") \
+    .config('spark.sql.warehouse.dir', 'file:///C:/') \
+    .getOrCreate()
+
+# File path for input JSON
+file_path = "/Users/manjukb/Desktop/Work_Related/ETL_python_Automation/DataPipeLine/NewEarthData.json"
+
+# Read JSON file with schema inference
+df = spark.read.option("multiline", "true").json(file_path)
+
+# Show a sample of data
+df.show(4)
+
+# Create a temporary view
+df.createOrReplaceTempView("BaseTable")
+
+# Filter rows where Cryosleep is true
+True_value_table = spark.sql('''
+    SELECT * 
+    FROM BaseTable 
+    WHERE Cryosleep = "true"
+''')
+
+# File path for output JSON
+file_Out_path = "/Users/manjukb/Desktop/Work_Related/ETL_python_Automation/DataPipeLine/truevalues.json"
+
+# Write the filtered data to JSON with overwrite mode
+True_value_table.coalesce(2).write.mode("overwrite").json(file_Out_path)
+
+# Stop Spark session
+spark.stop()
+
 
 
 from pyspark.sql import SparkSession

@@ -1,4 +1,11 @@
 
+SELECT 
+    email,
+    SUBSTRING(email, 1, CHARINDEX('@', email) - 1) AS name,
+    SUBSTRING(email, CHARINDEX('@', email) + 1, LEN(email)) AS domain
+FROM your_table;
+
+
 
 With New_Table As 
 (
@@ -82,8 +89,7 @@ CREATE TABLE `sharp-gecko-416405.new_dataset.t_cust`
 );
 
 INSERT INTO `sharp-gecko-416405.new_dataset.t_cust`
-(
-  CustId, Name, Plan_Name,Plan_start, Plan_end)
+(CustId, Name, Plan_Name,Plan_start, Plan_end)
 VALUES 
   (101, 'Madhu','P1','2021-01-01', '2021-06-30'),
   (101, 'Madhu','P2','2021-07-01', '2021-12-22'),
@@ -93,7 +99,8 @@ VALUES
   (104, 'Mona','P1','2022-03-01', '2022-10-31');
 
 
-Select CustId, Plan_Name, Plan_start, Plan_end From (
+Select CustId, Plan_Name, Plan_start, Plan_end 
+From (
 Select *,lead(Plan_start) Over (Partition By CustId Order By Plan_start ) as Next_Plan_Date, 
 date_diff( lead(Plan_start) Over (Partition By CustId Order By Plan_start ),Plan_end, Day ) As Exp_Diff
 From `sharp-gecko-416405.new_dataset.t_cust`
